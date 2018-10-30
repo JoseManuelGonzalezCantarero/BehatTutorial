@@ -11,6 +11,8 @@ use Behat\MinkExtension\Context\MinkContext;
  */
 class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
 {
+    private $output;
+
     /**
      * Initializes context.
      *
@@ -20,5 +22,31 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
      */
     public function __construct()
     {
+    }
+
+    /**
+     * @Given I have a file named :filename
+     */
+    public function iHaveAFileNamed($filename)
+    {
+        touch($filename);
+    }
+
+    /**
+     * @When I run :command
+     */
+    public function iRun($command)
+    {
+        $this->output = shell_exec($command);
+    }
+
+    /**
+     * @Then I should see :string in the output
+     */
+    public function iShouldSeeInTheOutput($string)
+    {
+        if (strpos($this->output, $string) === false) {
+            throw new \Exception(sprintf('Did not see "%s" in output "%s"', $string, $this->output));
+        }
     }
 }
